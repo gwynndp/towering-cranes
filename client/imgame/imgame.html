@@ -41,39 +41,43 @@
   <script>
     $(function(){
       var socket = io.connect();
-      var namespace = io('/imgame');
+      //var namespace = io('/imgame');
       var $messageForm = $('#messageForm');
       var $message = $('#message');
       var $chat = $('#chat');
       var user = localStorage.getItem('name')
-      console.log();
-      //var namespace = io('/imgame');
+
       var gametitle = document.getElementById("gametitle").value;
       console.log('gametitle?', gametitle);
 
-      socket.on('connect', function(){
-        socket.emit('room', gametitle);
-      });
+      // socket.on('connect', function(){
+      //   socket.emit('room', gametitle);
+      //   //socket.emit({room: gametitle, user: user});
+      // });
 
       $messageForm.submit(function(e){
         e.preventDefault();
         console.log('Submitted', $message.val());
         if($message.val() !== '') {
-          socket.emit('send message', {message: '<b>'+user+'</b>: '+$message.val(), room: gametitle});
+          socket.emit('send message', {message: '<b>'+user+'</b>: '+$message.val(), room: gametitle, user: user});
         }
-
         $message.val('');
         $message.focus();
       });
 
       socket.on('new message', function(data) {
-        $chat.append('<div class="well">'+data.msg+'</div>');
+        $chat.append('<div class="new-chat-msg">'+data.msg+'</div>');
         $('.chat').scrollTop($('.chat').prop('scrollHeight'));
       });
 
-      socket.on('message', function(data) {
-        console.log('incoming message', data);
-      })
+      socket.on('new user', function(data) {
+        $chat.append('<div class="new-chat-user">'+data.msg+'</div>');
+        $('.chat').scrollTop($('.chat').prop('scrollHeight'));
+      });
+
+      // socket.on('message', function(data) {
+      //   console.log('incoming message', data);
+      // })
 
     });
   </script>

@@ -20,10 +20,10 @@ app.use(bodyParser.json({limit: '5mb'}));
 var connections = [];
 var io = require('socket.io')(server);
 io.on('connection', function(socket) {
-  socket.emit('news', {hello: 'world'});
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
+  // socket.emit('news', {hello: 'world'});
+  // socket.on('my other event', function (data) {
+  //   console.log(data);
+  // });
 
   connections.push(socket);
   console.log('Connected: %s sockets connected', connections.length);
@@ -35,16 +35,20 @@ io.on('connection', function(socket) {
 
   socket.on('send message', function(data) {
     console.log('wut is data------', data);
+    socket.join(data.room, function() {
+      console.log(data.user+' joined the room');
+      //io.to(data.room).emit('new user', { msg: data.user+' has joined the room'});
+    });
     io.sockets.in(data.room).emit('new message', {msg: data.message});
   });
 
-  socket.on('room', function(room) {
-    gameroom = room
-    socket.join(room, function() {
-      io.to('room', 'a new user has joined the room')
-    })
-    io.sockets.in(room).emit('message', "what's up party people?")
-  });
+  // socket.on('room', function(room) {
+  //   //gameroom = room
+  //   socket.join(room, function() {
+  //     io.to('room', 'a new user has joined the room')
+  //   });
+  //   io.sockets.in(room).emit('message', "what's up party people?");
+  // });
 
 });
 
